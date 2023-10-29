@@ -18,7 +18,6 @@ const (
 )
 
 func main() {
-	//connStr := "postgresql://postgres:admin@5432/go_to_do?sslmode=disable
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -56,7 +55,21 @@ func main() {
 }
 
 func indexHandler(c *fiber.Ctx, db *sql.DB) error {
-	return c.SendString("Hello")
+	var res string
+	var todos []string
+	rows, err := db.Query("SELECT * FROM todos")
+	defer rows.Close()
+	if err != nil {
+		log.Fatalln(err)
+		c.JSON("An error occured")
+	}
+	for rows.Next() {
+		rows.Scan(&res)
+		todos = append(todos, res)
+	}
+	return c.Render("index", fiber.Map{
+		"Todos": todos,
+	})
 }
 
 func postHandler(c *fiber.Ctx, db *sql.DB) error {
