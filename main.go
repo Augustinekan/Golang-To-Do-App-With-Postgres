@@ -55,6 +55,7 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
+	app.Static("/", "./public")
 	log.Fatalln(app.Listen(fmt.Sprintf(":%v", port)))
 }
 
